@@ -8,17 +8,8 @@
 // ==/UserScript==
 
 (function() {
-	var scripts = [];
-	for(var i = 0, ii = scripts.length ; i < ii ; i++) {
-		var script = document.createElement("script");
-		script.type = "text/javascript";
-		script.src = scripts[i];
-		document.head.appendChild(script);	
-	}
 
-	var style = document.createElement("style");
-	style.type = "text/css";
-	style.textContent = "\
+	var style = "\
 		#pnjs {\
 			width: 100%;\
 			margin: 0;\
@@ -37,13 +28,25 @@
 			padding: 2px;\
 		}\
 	";
-	document.head.appendChild(style);
 
 	document.addEventListener("DOMContentLoaded", function() {
+		jQuery("body").append(jQuery('<style type="text/css">' + style + '</style>'));
+
+		/**
+		* Renvoie la valeur d'une caractéristique en fonction de l'index spécifié.
+		* @param idx Index à récupérer au sein de cells
+		* @param cells Contient toutes les caractéristiques
+		* @return Un entier qui correspond à la valeur trouvé dans cells
+		*/
 		function getCellValue(idx, cells) {
 			return parseInt(cells[idx].innerHTML, 10);
 		}
 
+		/**
+		* Récupère les informations de carrière (pouvoir, type, etc.) dans la chaîne de caractères passé en paramètres.
+		* @param content Content le nœud des carrières.
+		* @return Objet Json sous la forme {"nom": <Nom trouvé>, "niveau": <Niveau trouvé>}
+		*/
 		function getCarriere(content) {
 			return {
 				"nom": trim(content.replace(/^([^\(]+)\(.*$/, "$1").replace(/^\s/, "").replace(/\s*$/, "")),
@@ -51,6 +54,11 @@
 			};
 		}
 
+		/**
+		* Fait un trim sur une chaîne de caractères.
+		* @param str Chaîne sur laquelle appliquer le trim
+		* @return Chaîne modifiée
+		*/
 		function trim(str) {
 			return str.replace(/^\s*/, "").replace(/\s*$/, "");
 		}
@@ -65,12 +73,15 @@
 		}
 
 		for(var i = 0, ii = nodes.length ; i < ii ; i++) {
+			// Comme on récupère tous les nœuds <tr>, on a également les en-têtes.
+			// Quand on trouve la chaîne Provinces, on récupère et stocke la liste. Et on passe au <tr> suivant.
 			if(nodes[i].innerHTML.match(/Provinces : /)) {
 				provinces = nodes[i].firstChild.innerHTML.replace(/Provinces\s*:\s*/, "").split(/\s*,\s*/);
 				continue;
 			}
+			// Ici, on est tombés sur une en-tête du type de créatures (Criminels, etc.)
+			// On fait un de la liste des provinces
 			else if($(nodes[i].firstChild).hasClass('thb')) {
-				console.log(nodes[i].firstChild);
 				provinces = [];
 			}
 
@@ -142,6 +153,7 @@
 
 	function refreshTable(pnjs) {
 		var pnjsArray = [];
+		// On convertit l'objet Json en tableau qui pourra être lu par DataTables
 		for(var i = 0, ii = pnjs.length ; i < ii ; i++) {
 			pnjsArray.push([
 				pnjs[i].nom,
@@ -159,6 +171,7 @@
 			]);
 		}
 
+		// On insère la DataTable dans le DOM, et on la remplit
 		$('<table cellpadding="0" style="width:100%; float: left; margin: 0" cellspacing="0" border="0" class="display" id="pnjs"></table>').insertAfter(".page-title:first");
 		$("#pnjs").dataTable({
 			"iDisplayLength": 50,
@@ -185,7 +198,13 @@
 		});
 	}
 
+	// Booléen qui permet de savoir si la mise à jour est en cours
 	var updating = false;
+
+	/**
+	* Cette fonction permet de récupérer tous les PNJ trouvés dans la page et les stocke via IndexedDB.
+	* Si le PNJ existe, on le supprime et on l'insère à nouveau
+	*/
 	function updateDB() {
 		if (!window.indexedDB) {
 			alert("Votre navigateur ne gère pas la fonctionnalité indexedDB");
@@ -200,6 +219,7 @@
  		var waitingMessage = "En cours...";
  		jQuery(".update-db").html(waitingMessage);
 
+ 		// Connexion à IndexedDB
 		var server;
 		db.open( {
 			server: 'pnj',
@@ -220,39 +240,32 @@
 			var added = 0;
 			var toAdd = window.pnjsObj.length;
 
+			// On boucle sur tous les PNJ qu'on a trouvés plutôt (et stockés dans l'objet global)
 			for(var i = 0, ii = window.pnjsObj.length ; i < ii ; i++) {
 				server.pnj.query()
 					.filter("id", window.pnjsObj[i].id.toString())
 					.execute()
 					.done($.proxy(function(pnj, results) {
-						if(results.length > 0) {
-							console.log("already exists, updating", pnj);
-							server.pnj.remove(pnj.id).done(jQuery.proxy(function(pnj) {
-								server.pnj.add(pnj).done(function(item) {
-									console.log("new item added", item);
-									added++;
-									if(added == toAdd) {
- 										jQuery(".update-db").html("(Màj de la base)");
- 										updating = false;
-									}
-									else {
-										jQuery(".update-db").html(waitingMessage + ' ' + added + '/' + toAdd);
-									}
-								});
-							}, this, pnj));
-						}
-						else {
-							server.pnj.add(pnj).done(function(item) {
-								console.log("new item added", item);
-								added++;
-								if(added == toAdd) {
+						// Fonction de callback qui est appelée quand un utilisateur est inséré
+						var cbAdded = function(item) {
+							added++;
+							if(added == toAdd) {
 									jQuery(".update-db").html("(Màj de la base)");
 									updating = false;
-								}
-								else {
-									jQuery(".update-db").html(waitingMessage + ' ' + added + '/' + toAdd);
-								}
-							});
+							}
+							else {
+								jQuery(".update-db").html(waitingMessage + ' ' + added + '/' + toAdd);
+							}
+						};
+
+						// Si l'utilisateur existe, on le supprime pour l'insérer de nouveau
+						if(results.length > 0) {
+							server.pnj.remove(pnj.id).done(jQuery.proxy(function(pnj) {
+								server.pnj.add(pnj).done(cbAdded);
+							}, this, pnj));
+						} // Il n'existe pas, on l'insère
+						else {
+							server.pnj.add(pnj).done(cbAdded);
 						}
 				}, this, window.pnjsObj[i]));
 			}
