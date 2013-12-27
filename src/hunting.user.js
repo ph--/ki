@@ -57,28 +57,20 @@
 		return ((node != null || typeof(node) != "undefined") ? node : document).querySelectorAll(selector);
 	}
 
+	/**
+	* Constructeur de l'objet HuntingHelper
+	*/
 	function HuntingHelper() {
 		this.definitions = {};
 		this.trophies = [];
 		this.server = null;
 	}
 
-	HuntingHelper.prototype.parseTrophies = function() {
-		console.log('HuntingHelper::parseTrophies');
-		var nodes = $("#central-content .left-frame h5:nth-of-type(3)");
-		if(nodes.length === 1) {
-			var trophiesTmp = nodes[0].nextSibling.textContent.split(/ - /);
-			for(var i = 0, ii = trophiesTmp.length ; i < ii ; i++) {
-				var nom = trophiesTmp[i].replace(/^([^\(]+)\(?.*/, "$1").trim();
-				var nb = parseInt(trophiesTmp[i].replace(/^.*\(([0-9]+)\).*$/, "$1"), 10);
-				if(isNaN(nb)) {
-					nb = 1;
-				}
-				this.trophies[nom] = nb;
-			}
-		}
-	};
-
+	/**
+	* Initialise le traitement des trophées :
+	*  - extraction des trophées
+	*  - connexion à IndexedDB
+	*/
 	HuntingHelper.prototype.init = function() {
 		console.log('HuntingHelper::init');
 		this.parseTrophies();
@@ -98,6 +90,14 @@
 		}).done(jQuery.proxy(this.ready, this));
 	}
 
+	/**
+	* Cette méthode est appelée quand la connexion à IndexedDB est prête.
+	* Puis on va récupérer la liste de tous les PNJ existants et on va afficher les kills par :
+	*  - province
+	*  - type de pnj
+	*  - niveau du pnj
+	* @param s Objet serveur d'IndexedDB
+	*/
 	HuntingHelper.prototype.ready = function(s) {
 		console.log('HuntingHelper::ready');
 		this.server = s;
@@ -113,6 +113,35 @@
 			}, this));
 	}
 
+	/**
+	* Récupère la liste de tous les trophées et créé un objet JSON du type :
+	* {
+	*	"Brigand": 12,
+	*	"Aigle Géant": 2,
+	*	"Mouton": 5
+	* }
+	*/
+	HuntingHelper.prototype.parseTrophies = function() {
+		console.log('HuntingHelper::parseTrophies');
+		var nodes = $("#central-content .left-frame h5:nth-of-type(3)");
+		if(nodes.length === 1) {
+			var trophiesTmp = nodes[0].nextSibling.textContent.split(/ - /);
+			for(var i = 0, ii = trophiesTmp.length ; i < ii ; i++) {
+				var nom = trophiesTmp[i].replace(/^([^\(]+)\(?.*/, "$1").trim();
+				var nb = parseInt(trophiesTmp[i].replace(/^.*\(([0-9]+)\).*$/, "$1"), 10);
+				if(isNaN(nb)) {
+					nb = 1;
+				}
+				this.trophies[nom] = nb;
+			}
+		}
+	};
+
+	/**
+	* Affiche les résultats par provinces.
+	* Le traitement entre displayByProvinces et displayByKey est légèrement différent, donc je n'ai pas cherché à les fusionner.
+	* @param results Tableau qui contient tous les PNJ.
+	*/
 	HuntingHelper.prototype.displayByProvinces = function(results) {
 		console.log('HuntingHelper::displayByProvinces');
 
@@ -149,6 +178,14 @@
 		this.showResults('provinces', data);
 	}
 
+	/**
+	* Affiche les résultats en fonction de la clé passée en paramètre.
+	* Le traitement entre displayByProvinces et displayByKey est légèrement différent, donc je n'ai pas cherché à les fusionner.
+	* @param results Tableau qui contient tous les PNJ.
+	* @param key Clé avec laquelle il faut grouper les résultats
+	* @param title Titre de la section
+	* @param cbLabel Fonction permet de modifier le libellé de sous-sections comme on veut
+	*/
 	HuntingHelper.prototype.displayByKey = function(results, key, title, cbLabel) {
 		console.log('HuntingHelper::displayByPnjTypes');
 
@@ -185,6 +222,11 @@
 		this.showResults(key, data);
 	}
 
+	/**
+	* Cette méthode va afficher les résultats obtenus
+	* @param type Type de liste (provinces, types, etc.)
+	* @param data Données à mettre en forme
+	*/
 	HuntingHelper.prototype.showResults = function(type, data) {
 		console.log('HuntingHelper::showResults');
 		var keys = Object.keys(data).sort();
@@ -224,6 +266,7 @@
 		}
 	}
 
+	// On lance le traitement quand le DOM est prêt
 	document.addEventListener("DOMContentLoaded", function() {
 		var ht = new HuntingHelper();
 		ht.init();
