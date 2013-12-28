@@ -53,13 +53,35 @@
 		'.hunting-helper-status {'+
 		'	width: 16px;'+
 		'	height: 16px;'+
+		'	border-radius:50%;'+
 		'}'+
-		'.hunting-helper-status-ok {'+
-		'	background: url(https://cdn2.iconfinder.com/data/icons/basicset/tick_16.png);'+
+		'.hunting-helper-status-0 {'+
+		'	background-image: -moz-radial-gradient(45px 45px 45deg, circle farthest-corner, #AA0000 0%, #FF4040 100%, #FF0000 5%);'+
+		'	background-image: radial-gradient(45px 45px 45deg, circle farthest-corner, #AA0000 0%, #FF4040 100%, #FF0000 5%);'+
 		'}'+
-		'.hunting-helper-status-ko {'+
-		'	background: url(https://cdn1.iconfinder.com/data/icons/basicset/delete_16.png);'+
-	'}';
+		'.hunting-helper-status-25 {'+
+		'	background-image: -moz-radial-gradient(45px 45px 45deg, circle farthest-corner, #EE0000 0%, #FFDD00 100%, #aa5000 5%);'+
+		'	background-image: radial-gradient(45px 45px 45deg, circle farthest-corner, #EE0000 0%, #FFDD00 100%, #aa5000 5%);'+
+		'}'+
+		'.hunting-helper-status-50 {'+
+		'	background-image: -moz-radial-gradient(45px 45px 45deg, circle farthest-corner, #CCCC00 0%, #FFFF00 100%, #aa5000 5%);'+
+		'	background-image: radial-gradient(45px 45px 45deg, circle farthest-corner, #CCCC00 0%, #FFFF00 100%, #aa5000 5%);'+
+		'}'+
+		'.hunting-helper-status-75 {'+
+		'	background-image: -moz-radial-gradient(45px 45px 45deg, circle farthest-corner, #009900 0%, #00FF00 100%, #0000FF 5%);'+
+		'	background-image: radial-gradient(45px 45px 45deg, circle farthest-corner, #009900 0%, #00FF00 100%, #0000FF 5%);'+
+		'}'+
+		'.hunting-helper-status-100 {'+
+		'	background-image: -moz-radial-gradient(45px 45px 45deg, circle farthest-corner, #000000 0%, #00CC00 100%, #0000FF 5%);'+
+		'	background-image: radial-gradient(45px 45px 45deg, circle farthest-corner, #000000 0%, #00CC00 100%, #0000FF 5%);'+
+		'}'+
+	'';
+
+		/*jQuery(".sl").append(jQuery('<div style="background-image:-moz-radial-gradient(45px 45px 45deg, circle farthest-corner, #AA0000 0%, #FF4040 100%, #FF0000 5%);height:16px;width:16px;border-radius:50%"></div>'));
+		jQuery(".sl").append(jQuery('<div style="background-image:-moz-radial-gradient(45px 45px 45deg, circle farthest-corner, #EE0000 0%, #FFDD00 100%, #aa5000 5%);height:16px;width:16px;border-radius:50%"></div>'));
+		jQuery(".sl").append(jQuery('<div style="background-image:-moz-radial-gradient(45px 45px 45deg, circle farthest-corner, #CCCC00 0%, #FFFF00 100%, #aa5000 5%);height:16px;width:16px;border-radius:50%"></div>'));
+		jQuery(".sl").append(jQuery('<div style="background-image:-moz-radial-gradient(45px 45px 45deg, circle farthest-corner, #009900 0%, #00FF00 100%, #0000FF 5%);height:16px;width:16px;border-radius:50%"></div>'));
+		jQuery(".sl").append(jQuery('<div style="background-image:-moz-radial-gradient(45px 45px 45deg, circle farthest-corner, #000000 0%, #00CC00 100%, #0000FF 5%);height:16px;width:16px;border-radius:50%"></div>'));*/
 
 	String.prototype.trim = function() {
 		return this.replace(/^\s*/, "").replace(/\s*$/, "");
@@ -266,9 +288,26 @@
 			if(data.hasOwnProperty(key)) {
 				var shortId = data[key].name.replace(/[\s\.]/g, "_");
 
+				var percentKills = Math.floor(((data[key].kills / data[key].total) * 10000)) / 100;
+				if(percentKills == 0) {
+					killingStatus = '0';
+				}
+				else if(percentKills < 25) {
+					killingStatus = '25';
+				}
+				else if(percentKills < 75) {
+					killingStatus = '50';
+				}
+				else if(percentKills < 100) {
+					killingStatus = '75';
+				}
+				else if(percentKills == 100) {
+					killingStatus = '100';
+				}
+
 				jQuery("#HuntingHelper-" + type + "-container").append(jQuery('<div class="hunting-helper-title" id="' + shortId + '-' + type + '-title">' +
 					data[key].name + " - " + data[key].kills + "/" + data[key].total +
-					'<span class="f-right hunting-helper-status hunting-helper-status-' + ((data[key].kills == data[key].total) ? 'ok' : 'ko' ) + '">&nbsp;</span>'+
+					'<span class="f-right hunting-helper-status hunting-helper-status-' + killingStatus + '" title="' + percentKills + ' %">&nbsp;</span>'+
 					'</div>'+
 					'<ul class="hunting-helper-container "id="' + shortId + '-' + type + '-container"></ul>'));
 
