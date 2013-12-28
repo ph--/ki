@@ -21,12 +21,12 @@
 		'	list-style-type: none;'+
 		'}'+
 		'.hunting-helper-sub-container > img {'+
-		'	width: 45px;'+
+		'	width: 30px;'+
 		'	border: 1px solid #ccc;'+
 		'	vertical-align: middle;'+
 		'	display: inline-block;'+
-		'	min-width:45px;'+
-		'	min-height:45px;'+
+		'	min-width: 30px;'+
+		'	min-height: 30px;'+
 		'}'+
 		'.hunting-helper-container {'+
 		'	display: none;'+
@@ -107,9 +107,12 @@
 			.filter()
 			.execute()
 			.done(jQuery.proxy(function(results) {
+				for(var i = 20 ; i < 45 ; i++) {
+					console.log(JSON.stringify(results[i]));
+				}
 				this.displayByProvinces(results);
-				this.displayByKey(results, 'pnjType', 'Trophées par types de PNJ');
-				this.displayByKey(results, 'niveau', 'Trophées par niveaux', function(str) { return 'Niveau ' + str});
+				this.displayByKey(results, 'pnjType', 'Trophées par type de PNJ');
+				this.displayByKey(results, 'niveau', 'Trophées par niveau', function(str) { return 'Niveau ' + str});
 			}, this));
 	}
 
@@ -145,7 +148,7 @@
 	HuntingHelper.prototype.displayByProvinces = function(results) {
 		console.log('HuntingHelper::displayByProvinces');
 
-		jQuery("#HuntingHelper-container").append(jQuery('<h5>Trophées par provinces (<span id="hunting-helper-provinces-show-all" class="hunting-helper-show-all">Tout afficher/cacher</span>)</h5>'+
+		jQuery("#HuntingHelper-container").append(jQuery('<h5>Trophées par province (<span id="hunting-helper-provinces-show-all" class="hunting-helper-show-all">Tout afficher/cacher</span>)</h5>'+
 			'<div id="HuntingHelper-provinces-container"></div>'));
 
 		jQuery("#hunting-helper-provinces-show-all").on('click', function() {
@@ -192,7 +195,7 @@
 		jQuery("#HuntingHelper-container").append(jQuery('<h5>' + title + ' (<span id="hunting-helper-' + key + '-show-all" class="hunting-helper-show-all">Tout afficher/cacher</span>)</h5>'+
 			'<div id="HuntingHelper-' + key + '-container"></div>'));
 
-		jQuery("#hunting-helper-types-show-all").on('click', function() {
+		jQuery("#hunting-helper-" + key + "-show-all").on('click', function() {
 			jQuery("#HuntingHelper-" + key + "-container .hunting-helper-container").fadeToggle('fast', 'linear');
 		});
 

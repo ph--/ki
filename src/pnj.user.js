@@ -242,32 +242,17 @@
 
 			// On boucle sur tous les PNJ qu'on a trouvés plutôt (et stockés dans l'objet global)
 			for(var i = 0, ii = window.pnjsObj.length ; i < ii ; i++) {
-				server.pnj.query()
-					.filter("id", window.pnjsObj[i].id.toString())
-					.execute()
-					.done($.proxy(function(pnj, results) {
-						// Fonction de callback qui est appelée quand un utilisateur est inséré
-						var cbAdded = function(item) {
-							added++;
-							if(added == toAdd) {
-									jQuery(".update-db").html("(Màj de la base)");
-									updating = false;
-							}
-							else {
-								jQuery(".update-db").html(waitingMessage + ' ' + added + '/' + toAdd);
-							}
-						};
-
-						// Si l'utilisateur existe, on le supprime pour l'insérer de nouveau
-						if(results.length > 0) {
-							server.pnj.remove(pnj.id).done(jQuery.proxy(function(pnj) {
-								server.pnj.add(pnj).done(cbAdded);
-							}, this, pnj));
-						} // Il n'existe pas, on l'insère
-						else {
-							server.pnj.add(pnj).done(cbAdded);
-						}
-				}, this, window.pnjsObj[i]));
+				var cbAdded = function(item) {
+					added++;
+					if(added == toAdd) {
+							jQuery(".update-db").html("(Màj de la base)");
+							updating = false;
+					}
+					else {
+						jQuery(".update-db").html(waitingMessage + ' ' + added + '/' + toAdd);
+					}
+				};
+				server.pnj.update(window.pnjsObj[i]).done(cbAdded);
 			}
 		});
 	}
