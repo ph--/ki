@@ -80,7 +80,7 @@ Ensuite, il faut se rendre dans la section « Profil détaillé » et visualiser
 ![alt tag](http://i.imgur.com/Ho74k9B.png)
 
 
-Enregistrement des ordres effectués
+Journalisation des ordres effectués
 --
 Ce script permet de conserver dans le navigateur une trace de tous les ordres qui ont été effectués. Les ordres sont stockés sous forme d'objets JSON via localStorage :
 ```javascript
