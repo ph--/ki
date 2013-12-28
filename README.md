@@ -2,6 +2,13 @@ Kraland
 ==
 Cette page contient un certain nombre de scripts utilisables sur les pages de Kraland.org.
 
+Remarques sur les scripts
+--
+- Aucune information n'est envoyée vers l'extérieur.
+- Aucune information n'est stockée en dehors de votre navigateur.
+- Les techniques de stockage utilisées sont toutes locales, et sont gérées par le navigateur : IndexedDB, localStorage.
+- Certains librairies ont été utilisées : db.js, jQuery, DataTables.
+
 Bestiaire sous forme de tableau triable/filtrable
 --
 Le premier script (pnj.user.js) permet d'avoir une mise en forme plus interactive du bestiaire.
@@ -72,3 +79,52 @@ Ensuite, il faut se rendre dans la section « Profil détaillé » et visualiser
 ![alt tag](http://i.imgur.com/Wwwwpyx.png)
 ![alt tag](http://i.imgur.com/Ho74k9B.png)
 
+
+Journalisation des ordres effectués
+--
+Ce script permet de conserver dans le navigateur une trace de tous les ordres qui ont été effectués. Les ordres sont stockés sous forme d'objets JSON via localStorage :
+```javascript
+{
+    "timestamp": 1381778220,
+    "chances": 28,
+    "jet": 52,
+    "result": false,
+    "data": "Vous êtes entré, sans réussir à être discret, dans le bâtiment Hôtel « Le Jus de Citrouille » [19,8]."
+}
+```
+On retrouve :
+ - timestamp : correspond à la date (ici 14/10/2013 à 21:17)
+ - chances : les chances de réussir l'action
+ - jet : le jet réalisé
+ - result : action réussie ou ratée (true = réussie, false = ratée)
+ - data : le message associé à l'ordre (ça peut être un discours complet)
+ 
+À partir de ces informations, il est ensuite possible de réaliser des statistiques, par exemple (via la console Javascript de votre navigateur) :
+```javascript
+var nb = 0;
+var totalJet = 0;
+var totalPotentiel = 0;
+for(var key in localStorage) {
+    if(key.indexOf("stat_") != -1) {
+        var json = JSON.parse(localStorage.getItem(key));
+        var message = "" + json.data;
+        if(!message.match(/pas réussi à vous cacher/)) {
+            totalJet += json.jet;
+            totalPotentiel += json.chances;
+            nb++;
+        }
+    }
+}
+console.log("Potentiel moyen", totalPotentiel/nb);
+console.log("Jet moyen", totalJet/nb);
+console.log("Total", nb);
+```
+
+Dans cet exemple, j'ai enlevé les échecs pour se cacher car ça me pourrissait un peu les résultats. Et cela pourrait donner :
+```
+Potentiel moyen, 65.05671077504726
+Jet moyen, 45.555765595463136
+Total, 529
+```
+
+Qui a dit que la moyenne devrait être de 50 ? ;-)
