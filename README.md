@@ -4,8 +4,10 @@ Cette page contient un certain nombre de scripts utilisables sur les pages de Kr
 
 Remarques sur les scripts
 --
-Aucune requête vers l'extérieur n'est faite.
-Aucune information n'est stockée à l'extérieur de votre navigateur. Les systèmes de stockage utilisés sont : localStorage, IndexedDB.
+- Aucune information n'est envoyée vers l'extérieur.
+- Aucune information n'est stockée en dehors de votre navigateur.
+- Les techniques de stockage utilisées sont toutes locales, et sont gérées par le navigateur : IndexedDB, localStorage.
+- Certains librairies ont été utilisées : db.js, jQuery, DataTables.
 
 Bestiaire sous forme de tableau triable/filtrable
 --
@@ -80,7 +82,7 @@ Ensuite, il faut se rendre dans la section « Profil détaillé » et visualiser
 
 Enregistrement des ordres effectués
 --
-Chaque ordre effectué est enregistré dans le navigateur (via localStorage) sous la forme suivante :
+Ce script permet de conserver dans le navigateur une trace de tous les ordres qui ont été effectués. Les ordres sont stockés sous forme d'objets JSON via localStorage :
 ```javascript
 {
     "timestamp": 1381778220,
@@ -90,11 +92,12 @@ Chaque ordre effectué est enregistré dans le navigateur (via localStorage) sou
     "data": "Vous êtes entré, sans réussir à être discret, dans le bâtiment Hôtel « Le Jus de Citrouille » [19,8]."
 }
 ```
-On retrouve le :
- - 13817782 = 14/10/2013 à 21:17
- - les chances de réussir et le jet réalisé
- - le résultat : false/true
- - data : le message reçu après avoir passé l'ordre (ça peut être un discours complet)
+On retrouve :
+ - timestamp : correspond à la date (ici 14/10/2013 à 21:17)
+ - chances : les chances de réussir l'action
+ - jet : le jet réalisé
+ - result : action réussie ou ratée (true = réussie, false = ratée)
+ - data : le message associé à l'ordre (ça peut être un discours complet)
  
 À partir de ces informations, il est ensuite possible de réaliser des statistiques, par exemple (via la console Javascript de votre navigateur) :
 ```javascript
@@ -124,5 +127,4 @@ Jet moyen, 45.555765595463136
 Total, 529
 ```
 
-
-Qui a dit que la moyenne était de 50 ? :D
+Qui a dit que la moyenne devrait être de 50 ? ;-)
