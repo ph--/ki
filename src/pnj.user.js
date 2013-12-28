@@ -17,6 +17,7 @@
 		}\
 		#pnjs th {\
 			border: 1px solid #ccc;\
+			text-align: center;\
 		}\
 		#pnjs th:hover {\
 			cursor: pointer;\
