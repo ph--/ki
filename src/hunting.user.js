@@ -16,6 +16,18 @@
 		'.hunting-helper-title:hover {' +
 		'	cursor: pointer;'+
 		'}'+
+		'#HuntingHelper-container textarea {'+
+		'	width: 100%;'+
+		'	height: 5em;'+
+		'	margin: 0 0 5px 0;'+
+		'}'+
+		'#HuntingHelper-container button {'+
+		'	border: 1px solid #888;'+
+		'	background-color: #eee;'+
+		'	border-radius: 7px;'+
+		'	padding: 5px 7px;'+
+		'	float: right;'+
+		'}'+
 		'.hunting-helper-sub-container {'+
 		'	margin: 2px 0;'+
 		'	list-style-type: none;'+
@@ -73,7 +85,11 @@
 	*/
 	HuntingHelper.prototype.init = function() {
 		console.log('HuntingHelper::init');
-		this.parseTrophies();
+		var nodes = $("#central-content .left-frame h5:nth-of-type(3)");
+		if(nodes.length > 0) {
+			this.parseTrophies(nodes[0].nextSibling.textContent);	
+		}
+
 		db.open( {
 			server: 'pnj',
 			version: 1,
@@ -101,20 +117,34 @@
 	HuntingHelper.prototype.ready = function(s) {
 		console.log('HuntingHelper::ready');
 		this.server = s;
-		jQuery(".left-frame").append(jQuery('<div id="HuntingHelper-container"></div>'));
+		jQuery(".left-frame").append(jQuery('<div id="HuntingHelper-container">'+
+			'<h5>Saisir des trophées manuellement</h5>'+
+			'<p><textarea id="custom-hunting"></textarea><button id="custom-hunting-button">Valider</button><div style="clear:right">&nbsp;</div></p>'+
+			'<div id="HuntingHelper-container-results"></div>'));
 
+		jQuery("#custom-hunting-button").on('click', jQuery.proxy(this.onCustomHuntingClick, this));
+		this.processTrophies();
+
+	}
+
+	HuntingHelper.prototype.onCustomHuntingClick = function() {
+		console.log('HuntingHelper::onCustomHuntingClick');
+		this.parseTrophies(jQuery("#custom-hunting").val());
+		this.processTrophies();
+	};
+
+	HuntingHelper.prototype.processTrophies = function() {
+		console.log('HuntingHelper::processTrophies');
+		jQuery("#HuntingHelper-container-results").html("");
 		this.server.pnj.query()
 			.filter()
 			.execute()
 			.done(jQuery.proxy(function(results) {
-				for(var i = 20 ; i < 45 ; i++) {
-					console.log(JSON.stringify(results[i]));
-				}
 				this.displayByProvinces(results);
 				this.displayByKey(results, 'pnjType', 'Trophées par type de PNJ');
 				this.displayByKey(results, 'niveau', 'Trophées par niveau', function(str) { return 'Niveau ' + str});
 			}, this));
-	}
+	};
 
 	/**
 	* Récupère la liste de tous les trophées et créé un objet JSON du type :
@@ -124,19 +154,17 @@
 	*	"Mouton": 5
 	* }
 	*/
-	HuntingHelper.prototype.parseTrophies = function() {
+	HuntingHelper.prototype.parseTrophies = function(trophies) {
 		console.log('HuntingHelper::parseTrophies');
-		var nodes = $("#central-content .left-frame h5:nth-of-type(3)");
-		if(nodes.length === 1) {
-			var trophiesTmp = nodes[0].nextSibling.textContent.split(/ - /);
-			for(var i = 0, ii = trophiesTmp.length ; i < ii ; i++) {
-				var nom = trophiesTmp[i].replace(/^([^\(]+)\(?.*/, "$1").trim();
-				var nb = parseInt(trophiesTmp[i].replace(/^.*\(([0-9]+)\).*$/, "$1"), 10);
-				if(isNaN(nb)) {
-					nb = 1;
-				}
-				this.trophies[nom] = nb;
+		this.trophies = [];
+		var trophiesArr = trophies.split(/ - /);
+		for(var i = 0, ii = trophiesArr.length ; i < ii ; i++) {
+			var nom = trophiesArr[i].replace(/^([^\(]+)\(?.*/, "$1").trim();
+			var nb = parseInt(trophiesArr[i].replace(/^.*\(([0-9]+)\).*$/, "$1"), 10);
+			if(isNaN(nb)) {
+				nb = 1;
 			}
+			this.trophies[nom] = nb;
 		}
 	};
 
@@ -148,7 +176,7 @@
 	HuntingHelper.prototype.displayByProvinces = function(results) {
 		console.log('HuntingHelper::displayByProvinces');
 
-		jQuery("#HuntingHelper-container").append(jQuery('<h5>Trophées par province (<span id="hunting-helper-provinces-show-all" class="hunting-helper-show-all">Tout afficher/cacher</span>)</h5>'+
+		jQuery("#HuntingHelper-container-results").append(jQuery('<h5>Trophées par province (<span id="hunting-helper-provinces-show-all" class="hunting-helper-show-all">Tout afficher/cacher</span>)</h5>'+
 			'<div id="HuntingHelper-provinces-container"></div>'));
 
 		jQuery("#hunting-helper-provinces-show-all").on('click', function() {
@@ -192,7 +220,7 @@
 	HuntingHelper.prototype.displayByKey = function(results, key, title, cbLabel) {
 		console.log('HuntingHelper::displayByPnjTypes');
 
-		jQuery("#HuntingHelper-container").append(jQuery('<h5>' + title + ' (<span id="hunting-helper-' + key + '-show-all" class="hunting-helper-show-all">Tout afficher/cacher</span>)</h5>'+
+		jQuery("#HuntingHelper-container-results").append(jQuery('<h5>' + title + ' (<span id="hunting-helper-' + key + '-show-all" class="hunting-helper-show-all">Tout afficher/cacher</span>)</h5>'+
 			'<div id="HuntingHelper-' + key + '-container"></div>'));
 
 		jQuery("#hunting-helper-" + key + "-show-all").on('click', function() {
