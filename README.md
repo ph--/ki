@@ -2,10 +2,12 @@ Kraland
 ==
 Cette page contient un certain nombre de scripts utilisables sur les pages de Kraland.org.
 
-Mise en forme du bestiaire
+Bestiaire sous forme de tableau triable/filtrable
 --
 Le premier script (pnj.user.js) permet d'avoir une mise en forme plus interactive du bestiaire.
-Chaque page du bestiaire est disponible sous la forme d'un tableau triable, filtrable en fonction d'un certain nombre d'informations (niveau, carrières, nom, etc.).
+Chaque page du bestiaire est disponible sous la forme d'un tableau triable, filtrable sur de nombreuses informations (niveau, carrières, nom, province, etc.).
+
+![alt tag](http://i.imgur.com/gfETyud.png)
 
 Il permet également de stocker les informations de ces PNJ dans une base de données au sein du navigateur (via IndexedDB) sous la forme d'objets JSON.
 
@@ -66,3 +68,7 @@ Mise en forme des trophées
 Le second script (hunting.user.js) permet de faire des regroupements des différents trophées. Pour fonctionner, il est nécessaire d'avoir installé le script du bestiaire (pnj.user.js) et d'avoir mis à jour la base dans chacune des pages du bestaire (Ex : Dans la section « Créatures » du bestiaire, il faut cliquer sur le bouton « (Màj de la base) » qui se trouve dans le titre de la page).
 
 Ensuite, il faut se rendre dans la section « Profil détaillé » et visualiser les différents regroupements (par province, par type de PNJ, par niveau).
+
+![alt tag](http://i.imgur.com/Wwwwpyx.png)
+![alt tag](http://i.imgur.com/Ho74k9B.png)
+
