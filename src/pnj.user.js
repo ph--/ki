@@ -1,4 +1,6 @@
 // ==UserScript==
+// @name Kraland - Bestiaire interactif
+// @description Affichage du bestiaire sous forme de tableau interactif
 // @include http://www.kraland.org/main.php?p=3_14*
 // @require http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js
 // @require https://www.datatables.net/release-datatables/media/js/jquery.js

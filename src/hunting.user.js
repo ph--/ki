@@ -1,4 +1,6 @@
 // ==UserScript==
+// @name Kraland - Course aux trophées
+// @description Affiche les trophées sous différentes formes
 // @include http://www.kraland.org/main.php?p=2_3
 // @require http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js
 // @require https://raw.github.com/aaronpowell/db.js/master/src/db.js
@@ -18,7 +20,7 @@
 		'}'+
 		'#HuntingHelper-container textarea {'+
 		'	width: 100%;'+
-		'	height: 5em;'+
+		'	height: 8em;'+
 		'	margin: 0 0 5px 0;'+
 		'}'+
 		'#HuntingHelper-container button {'+
@@ -109,7 +111,12 @@
 		console.log('HuntingHelper::init');
 		var nodes = $("#central-content .left-frame h5:nth-of-type(3)");
 		if(nodes.length > 0) {
-			this.parseTrophies(nodes[0].nextSibling.textContent);	
+			// this.parseTrophies(nodes[0].nextSibling.textContent);
+			var trophies = jQuery("p", nodes[0].nextSibling);
+			for(var i = 0, ii = trophies.length ; i < ii ; i++) {
+				trophies[i] = trophies[i].innerHTML;
+			}
+			this.parseTrophies(trophies);
 		}
 
 		db.open( {
@@ -151,7 +158,8 @@
 
 	HuntingHelper.prototype.onCustomHuntingClick = function() {
 		console.log('HuntingHelper::onCustomHuntingClick');
-		this.parseTrophies(jQuery("#custom-hunting").val());
+		var trophies = jQuery("#custom-hunting").val().replace(/\n+/g, "-").replace(/-\s+-/g, "-");
+		this.parseTrophies(trophies.split(/\s*-\s*/));
 		this.processTrophies();
 	};
 
@@ -179,15 +187,23 @@
 	HuntingHelper.prototype.parseTrophies = function(trophies) {
 		console.log('HuntingHelper::parseTrophies');
 		this.trophies = [];
-		var trophiesArr = trophies.split(/ - /);
-		for(var i = 0, ii = trophiesArr.length ; i < ii ; i++) {
-			var nom = trophiesArr[i].replace(/^([^\(]+)\(?.*/, "$1").trim();
-			var nb = parseInt(trophiesArr[i].replace(/^.*\(([0-9]+)\).*$/, "$1"), 10);
+		for(var i = 0, ii = trophies.length ; i < ii ; i++) {
+			var nom = trophies[i].replace(/^([^\(]+)\(?.*/, "$1").trim();
+			var nb = parseInt(trophies[i].replace(/^.*\(([0-9]+)\).*$/, "$1"), 10);
 			if(isNaN(nb)) {
 				nb = 1;
 			}
 			this.trophies[nom] = nb;
 		}
+		//var trophiesArr = trophies.split(/ - /);
+		//for(var i = 0, ii = trophiesArr.length ; i < ii ; i++) {
+		//	var nom = trophiesArr[i].replace(/^([^\(]+)\(?.*/, "$1").trim();
+		//	var nb = parseInt(trophiesArr[i].replace(/^.*\(([0-9]+)\).*$/, "$1"), 10);
+		//	if(isNaN(nb)) {
+		//		nb = 1;
+		//	}
+		//	this.trophies[nom] = nb;
+		//}
 	};
 
 	/**
