@@ -137,3 +137,6 @@ Ce script permet, comme le titre l'indique, de pouvoir chercher des informations
  - description de l'ordre
 
 Le formulaire de recherche se trouve au-dessus de chaque liste (personnage, bâtiments, rencontres, etc.).
+![alt tag](http://i.imgur.com/5OwROTV.png)
+![alt tag](http://i.imgur.com/bpKhuKj.png)
+
