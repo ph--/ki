@@ -128,3 +128,12 @@ Total, 529
 ```
 
 Qui a dit que la moyenne devrait être de 50 ? ;-)
+
+Formulaire de recherche dans la liste des ordres
+--
+Ce script permet, comme le titre l'indique, de pouvoir chercher des informations directement dans la liste des ordres par :
+ - nom de l'ordre
+ - jet utilisé pour l'ordre
+ - description de l'ordre
+
+Le formulaire de recherche se trouve au-dessus de chaque liste (personnage, bâtiments, rencontres, etc.).
