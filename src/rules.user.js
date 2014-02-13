@@ -29,7 +29,7 @@
                         '<span>Résultats&nbsp;&nbsp;: <span id="nb_results"></span></span>';
 
                 /** Écoute des évènements */
-                document.querySelector(".page-title-center").appendChild(div);
+                document.querySelector(".page-title-center").parentNode.appendChild(div);
                 document.querySelector("#search_rules_by_name").addEventListener('keyup', onNameChanged, false);
                 document.querySelector("#search_rules_by_jet").addEventListener('keyup', onJetChanged, false);
                 document.querySelector("#search_rules_by_description").addEventListener('keyup', onDescriptionChanged, false);
