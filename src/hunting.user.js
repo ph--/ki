@@ -18,9 +18,18 @@
 		'.hunting-helper-title:hover {' +
 		'	cursor: pointer;'+
 		'}'+
+		'#HuntingHelper-container {'+
+		'	margin: 2em 0 5em 0;'+
+		'}'+
+		'#HuntingHelper-container-results:hover {'+
+		'	cursor: pointer;'+
+		'}'+
+		'#HuntingHelper-container-results h5 {'+
+		'	border-bottom: 1px solid #bbb;'+
+		'}'+
 		'#HuntingHelper-container textarea {'+
 		'	width: 100%;'+
-		'	height: 8em;'+
+		'	height: 15em;'+
 		'	margin: 0 0 5px 0;'+
 		'}'+
 		'#HuntingHelper-container button {'+
@@ -34,7 +43,7 @@
 		'	margin: 2px 0;'+
 		'	list-style-type: none;'+
 		'}'+
-		'.hunting-helper-sub-container > img {'+
+		'.img-small {'+
 		'	width: 30px;'+
 		'	border: 1px solid #ccc;'+
 		'	vertical-align: middle;'+
@@ -46,6 +55,9 @@
 		'	display: none;'+
 		'	padding: 0 0 0 1em;'+
 		'}'+
+		'.hunting-helper-show-all {'+
+		'	text-decoration: underline;'+
+		'}'+
 		'.hunting-helper-show-all:hover {'+
 		'	cursor: pointer;'+
 		'}'+
@@ -56,6 +68,13 @@
 		'	width: 16px;'+
 		'	height: 16px;'+
 		'	border-radius:50%;'+
+		'}'+
+		'.hunting-helper-kills {'+
+		'	font-weight: bold;'+
+		'	margin: 1em;'+
+		'}'+
+		'.kills-red {'+
+		'	color: red;'+
 		'}'+
 		'.hunting-helper-status-0 {'+
 		'	background-image: -moz-radial-gradient(45px 45px 45deg, circle farthest-corner, #AA0000 0%, #FF4040 100%, #FF0000 5%);'+
@@ -158,8 +177,9 @@
 
 	HuntingHelper.prototype.onCustomHuntingClick = function() {
 		console.log('HuntingHelper::onCustomHuntingClick');
-		var trophies = jQuery("#custom-hunting").val().replace(/\n+/g, "-").replace(/-\s+-/g, "-");
-		this.parseTrophies(trophies.split(/\s*-\s*/));
+		var trophies = jQuery("#custom-hunting").val().replace(/\n+/g, "|").replace(/\|\s+\|/g, "|");
+		console.log(trophies);
+		this.parseTrophies(trophies.split(/\s*\|\s*/));
 		this.processTrophies();
 	};
 
@@ -173,6 +193,7 @@
 				this.displayByProvinces(results);
 				this.displayByKey(results, 'pnjType', 'Trophées par type de PNJ');
 				this.displayByKey(results, 'niveau', 'Trophées par niveau', function(str) { return 'Niveau ' + str});
+				this.displayByNumber(results);
 			}, this));
 	};
 
@@ -214,9 +235,12 @@
 	HuntingHelper.prototype.displayByProvinces = function(results) {
 		console.log('HuntingHelper::displayByProvinces');
 
-		jQuery("#HuntingHelper-container-results").append(jQuery('<h5>Trophées par province (<span id="hunting-helper-provinces-show-all" class="hunting-helper-show-all">Tout afficher/cacher</span>)</h5>'+
-			'<div id="HuntingHelper-provinces-container"></div>'));
+		jQuery("#HuntingHelper-container-results").append(jQuery('<h5 id="hunting-helper-provinces-toggle">Trophées par province</h5>'+
+			'<div id="HuntingHelper-provinces-container" style="display: none"><span id="hunting-helper-provinces-show-all" class="hunting-helper-show-all">Tout afficher/cacher</span></div>'));
 
+		jQuery("#hunting-helper-provinces-toggle").on('click', function() {
+			jQuery("#HuntingHelper-provinces-container").fadeToggle('fast');
+		});
 		jQuery("#hunting-helper-provinces-show-all").on('click', function() {
 			jQuery("#HuntingHelper-provinces-container .hunting-helper-container").fadeToggle('fast', 'linear');
 		});
@@ -247,6 +271,57 @@
 		this.showResults('provinces', data);
 	}
 
+	HuntingHelper.prototype.displayByNumber = function(results) {
+		console.log('HuntingHelper::displayByNumber');
+
+		jQuery("#HuntingHelper-container-results").append(jQuery('<h5 id="huntingHelper-nb-container-toggle">Trophées par nombre de PNJ tués</h5>'+
+			'<div id="HuntingHelper-nb-container" style="display: none"></div>'));
+
+		jQuery("#huntingHelper-nb-container-toggle").on('click', function() {
+			jQuery("#HuntingHelper-nb-container").fadeToggle('fast');
+		});
+		jQuery("#hunting-helper-nb-show-all").on('click', function() {
+			jQuery("#HuntingHelper-nb-container .hunting-helper-container").fadeToggle('fast', 'linear');
+		});
+
+
+		// Cimetière
+		jQuery("#HuntingHelper-container-results").append(jQuery('<h5 id="huntingHelper-cemetery-container-toggle">Cimetière</h5>'+
+			'<div id="HuntingHelper-cemetery-container" style="display: none"></div>'));
+
+		jQuery("#huntingHelper-cemetery-container-toggle").on('click', function() {
+			jQuery("#HuntingHelper-cemetery-container").fadeToggle('fast');
+		});
+
+		var totalKills = 0;
+		var sortedTrophies = [];
+		for (var trophy in this.trophies) {
+		      sortedTrophies.push([trophy, this.trophies[trophy]]);
+		}
+		sortedTrophies.sort(function(a, b) {return b[1] - a[1]});
+
+		var pnj = {};
+		for(var i = 0, ii = results.length ; i < ii ; i++) {
+			pnj[results[i].nom] = results[i].img;
+		}
+
+		for(var j = 0, jj = sortedTrophies.length ; j < jj ; j++) {
+			jQuery('#HuntingHelper-nb-container').append(jQuery('<div class="hunting-helper-sub-container" id="HuntingHelper-nb-sub-container">'+
+			// '   <img src="' + sortedTrophies[j].img + '" />'+
+			'<img class="img-small" src="' + pnj[sortedTrophies[j][0]] + '" />'+
+			'   <span style="">' + sortedTrophies[j][0] + ' : ' + sortedTrophies[j][1] + '</span>'+
+			'</div>'));
+			totalKills += sortedTrophies[j][1];
+			for(var z = 0, zz = parseInt(sortedTrophies[j][1], 10) ; z < zz ; z++) {
+				jQuery("#HuntingHelper-cemetery-container").append('<img class="img-small" src="' + pnj[sortedTrophies[j][0]] + '" title="' + sortedTrophies[j][0] + '" />');
+			}
+		}
+
+		jQuery("#HuntingHelper-nb-container").append(jQuery('<div class="hunting-helper-kills">Total : ' + totalKills + '</div>'));
+		jQuery("#HuntingHelper-cemetery-container").append(jQuery('<div class="hunting-helper-kills">Total : ' + totalKills + '</div>'));
+
+	}
+
 	/**
 	* Affiche les résultats en fonction de la clé passée en paramètre.
 	* Le traitement entre displayByProvinces et displayByKey est légèrement différent, donc je n'ai pas cherché à les fusionner.
@@ -258,9 +333,12 @@
 	HuntingHelper.prototype.displayByKey = function(results, key, title, cbLabel) {
 		console.log('HuntingHelper::displayByPnjTypes');
 
-		jQuery("#HuntingHelper-container-results").append(jQuery('<h5>' + title + ' (<span id="hunting-helper-' + key + '-show-all" class="hunting-helper-show-all">Tout afficher/cacher</span>)</h5>'+
-			'<div id="HuntingHelper-' + key + '-container"></div>'));
+		jQuery("#HuntingHelper-container-results").append(jQuery('<h5 id="hunting-helper-' + key + '-toggle">' + title + '</h5>'+
+			'<div id="HuntingHelper-' + key + '-container" style="display: none"><span id="hunting-helper-' + key + '-show-all" class="hunting-helper-show-all">Tout afficher/cacher</span></div>'));
 
+		jQuery("#hunting-helper-" + key + "-toggle").on('click', function() {
+			jQuery("#HuntingHelper-" + key + "-container").fadeToggle('fast');
+		});
 		jQuery("#hunting-helper-" + key + "-show-all").on('click', function() {
 			jQuery("#HuntingHelper-" + key + "-container .hunting-helper-container").fadeToggle('fast', 'linear');
 		});
@@ -344,8 +422,8 @@
 						kills = 0;
 					}
 					jQuery('#' + shortId + '-' + type + '-container').append(jQuery('<li class="hunting-helper-sub-container" id="' + shortId + '-' + type + '-sub-container">'+
-					'   <img src="' + sortedData[j].img + '" />'+
-					'   <span style="">' + sortedData[j].nom + ' : ' + kills + '</span>'+
+					'   <img class="img-small" src="' + sortedData[j].img + '" />'+
+					'   <span style="">' + sortedData[j].nom + ' : ' + '<span class="' + ((kills == 0) ? 'kills-red' : '') + '">' + kills + '</span></span>'+
 					'</li>'));
 				}
 			}
