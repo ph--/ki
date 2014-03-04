@@ -9,7 +9,21 @@ Remarques sur les scripts
 - Les techniques de stockage utilisées sont toutes locales, et sont gérées par le navigateur : IndexedDB, localStorage.
 - Certains librairies ont été utilisées : db.js, jQuery, DataTables.
 
-Bestiaire sous forme de tableau triable/filtrable
+[Mise en forme des trophées]: https://github.com/ph--/ki/raw/master/src/hunting.user.js
+[Bestiaire interactif]: https://github.com/ph--/ki/raw/master/src/pnj.user.js
+[Journalisation des ordres effectués]: https://github.com/ph--/ki/raw/master/src/kraland_stats.user.js
+[Formulaire de recherche dans la liste des ordres]: https://github.com/ph--/ki/raw/master/src/rules.user.js
+
+Installation des scripts
+--
+Il faut au préalable que vous ayez installé GreaseMonkey (Firefox) ou TamperMonkey (Chrome) dans votre navigateur.
+Puis, en se rendant aux adresses suivantes, ces derniers devraient vous proposer de les installer :
+- [Bestiaire interactif][]
+- [Mise en forme des trophées][]
+- [Journalisation des ordres effectués][]
+- [Formulaire de recherche dans la liste des ordres][]
+
+Bestiaire sous forme de tableau triable/filtrable ([Bestiaire interactif][])
 --
 Le premier script (pnj.user.js) permet d'avoir une mise en forme plus interactive du bestiaire.
 Chaque page du bestiaire est disponible sous la forme d'un tableau triable, filtrable sur de nombreuses informations (niveau, carrières, nom, province, etc.).
@@ -70,7 +84,7 @@ Exemple d'objet :
    "armure":2
 }
 ```
-Mise en forme des trophées
+Mise en forme des trophées ([Mise en forme des trophées][])
 --
 Le second script (hunting.user.js) permet de faire des regroupements des différents trophées. Pour fonctionner, il est nécessaire d'avoir installé le script du bestiaire (pnj.user.js) et d'avoir mis à jour la base dans chacune des pages du bestaire (Ex : Dans la section « Créatures » du bestiaire, il faut cliquer sur le bouton « (Màj de la base) » qui se trouve dans le titre de la page).
 
@@ -80,7 +94,7 @@ Ensuite, il faut se rendre dans la section « Profil détaillé » et visualiser
 ![alt tag](http://i.imgur.com/Ho74k9B.png)
 
 
-Journalisation des ordres effectués
+Journalisation des ordres effectués ([Journalisation des ordres effectués][])
 --
 Ce script permet de conserver dans le navigateur une trace de tous les ordres qui ont été effectués. Les ordres sont stockés sous forme d'objets JSON via localStorage :
 ```javascript
@@ -129,7 +143,7 @@ Total, 529
 
 Qui a dit que la moyenne devrait être de 50 ? ;-)
 
-Formulaire de recherche dans la liste des ordres
+Formulaire de recherche dans la liste des ordres ([Formulaire de recherche dans la liste des ordres][])
 --
 Ce script permet, comme le titre l'indique, de pouvoir chercher des informations directement dans la liste des ordres par :
  - nom de l'ordre
