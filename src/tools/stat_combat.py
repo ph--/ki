@@ -12,10 +12,11 @@ from os import listdir
 from os.path import isfile, join
 from bs4 import BeautifulSoup
 
+# À spécifier
 user = {
-	"login": "",
-	"password": "",
-	"id": 0
+	"login": "",	# Nom d'utilisateur dans KI
+	"password": "", # Mot de passe dans KI
+	"id": 0 		# Votre identifiant dans KI
 }
 
 root = "http://www.kraland.org/"
@@ -58,6 +59,16 @@ def usage(errorcode):
 	sys.exit(errorcode)
 
 def main(argv):
+	if user["login"] == "":
+		print "\nVous devez spécifier un nom d'utilisateur (variable user au début de ce script"
+		sys.exit(2)
+	if user["password"] == "":
+		print "\nVous devez spécifier un mot de passe (variable user au début de ce script"
+		sys.exit(2)
+	if user["id"] == "":
+		print "\nVous devez spécifier votre identifiant de KI (variable user au début de ce script"
+		sys.exit(2)
+
 	try:
 		opts, args = getopt.getopt(argv, "", ["get", "file=", "directory=", "exportAll=", "exportSummary="])
 	except getopt.GetoptError:
